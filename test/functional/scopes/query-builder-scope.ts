@@ -4,8 +4,7 @@ import {Connection} from "../../../src/connection/Connection";
 import {expect} from "chai";
 import {Post} from "./entity/Post";
 
-describe.only("github issues > #1 implement scopes", () => {
-
+describe.only("scopes > query builder", () => {
     let connections: Connection[];
     before(async () => connections = await createTestingConnections({
         entities: [__dirname + "/entity/*{.js,.ts}"],
@@ -30,7 +29,7 @@ describe.only("github issues > #1 implement scopes", () => {
         const publicPosts = await connection
             .getRepository(Post)
             .createQueryBuilder("post")
-            .scope([Post.isPublic])
+            .scope(Post.isPublic)
             .getMany();
 
         expect(publicPosts.length).equal(2);
@@ -40,7 +39,7 @@ describe.only("github issues > #1 implement scopes", () => {
         await connection
             .getRepository(Post)
             .createQueryBuilder()
-            .scope([Post.isPublic])
+            .scope(Post.isPublic)
             .delete()
             .execute();
 
@@ -50,7 +49,6 @@ describe.only("github issues > #1 implement scopes", () => {
             .getMany();
         expect(allPosts.length).equal(1);
         allPosts[0].title.should.equal('post #2');
-
     })));
 
 
@@ -68,19 +66,38 @@ describe.only("github issues > #1 implement scopes", () => {
             ])
             .execute();
 
-        const publicPosts = await connection
+        const globalScopedPosts = await connection
             .getRepository(Post)
             .createQueryBuilder("post")
-            .globalScopes()
+            .globalScoped()
             .getMany();
 
-        expect(publicPosts.length).equal(3);
-        publicPosts[0].title.should.equal('post #1');
-        publicPosts[1].title.should.equal('post #4');
-        publicPosts[2].title.should.equal('post #5');
-
+        expect(globalScopedPosts.length).equal(3);
+        globalScopedPosts[0].title.should.equal('post #1');
+        globalScopedPosts[1].title.should.equal('post #4');
+        globalScopedPosts[2].title.should.equal('post #5');
     })));
 
-    // you can add additional tests if needed
 
+    it("should apply scope with parameter and multiple scopes", () => Promise.all(connections.map(async connection => {
+        await connection
+            .createQueryBuilder()
+            .insert()
+            .into(Post)
+            .values([
+                { title: "post #1", stage: "public", views: 100 },
+                { title: "post #2", stage: "draft", views: 200 },
+                { title: "post #3", stage: "public", views: 300 },
+            ])
+            .execute();
+
+        const globalScopedPosts = await connection
+            .getRepository(Post)
+            .createQueryBuilder("post")
+            .scope([Post.hasViewsAtLeast(200), Post.isDraft])
+            .getMany();
+
+        expect(globalScopedPosts.length).equal(1);
+        globalScopedPosts[0].title.should.equal('post #2');
+    })));
 });

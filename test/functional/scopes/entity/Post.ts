@@ -34,4 +34,11 @@ export class Post {
     static hasViewsAtLeast100(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
         return qb.andWhere('views >= :views', {views: 100});
     }
+
+    @Scope()
+    static hasViewsAtLeast(views: number): (qb: SelectQueryBuilder<Post>) => SelectQueryBuilder<Post> {
+        return function(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
+            return qb.andWhere('views >= :views', {views: views});
+        }
+    }
 }

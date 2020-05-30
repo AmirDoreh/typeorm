@@ -264,7 +264,7 @@ export abstract class QueryBuilder<Entity> {
         return new SoftDeleteQueryBuilderCls(this);
     }
 
-    globalScopes(): this {
+    globalScoped(): this {
         const metadata = this.expressionMap.mainAlias!.metadata;
         const scopeFns = metadata.scopes.filter(scope => scope.global).map(scope => {
             return (scope.target as any)[scope.propertyName] as ScopeFn<this>;
@@ -273,7 +273,10 @@ export abstract class QueryBuilder<Entity> {
         return this;
     }
 
-    scope(scopeFns: Array<ScopeFn<this>>): this {
+    scope(scopeFn: ScopeFn<this>): this;
+    scope(scopeFns: Array<ScopeFn<this>>): this;
+    scope(scopeFn:  ScopeFn<this> | Array<ScopeFn<this>>): this {
+        const scopeFns = Array.isArray(scopeFn) ? scopeFn : [scopeFn];
         scopeFns.forEach(scopeFn => {
             scopeFn(this);
         });
