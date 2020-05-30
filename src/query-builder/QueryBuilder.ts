@@ -11,7 +11,6 @@ import {RelationQueryBuilder} from "./RelationQueryBuilder";
 import {ObjectType} from "../common/ObjectType";
 import {Alias} from "./Alias";
 import {Brackets} from "./Brackets";
-import {ScopeFn} from "../decorator/scopes/Scope";
 import {QueryDeepPartialEntity} from "./QueryPartialEntity";
 import {EntityMetadata} from "../metadata/EntityMetadata";
 import {ColumnMetadata} from "../metadata/ColumnMetadata";
@@ -264,24 +263,6 @@ export abstract class QueryBuilder<Entity> {
         return new SoftDeleteQueryBuilderCls(this);
     }
 
-    globalScoped(): this {
-        const metadata = this.expressionMap.mainAlias!.metadata;
-        const scopeFns = metadata.scopes.filter(scope => scope.global).map(scope => {
-            return (scope.target as any)[scope.propertyName] as ScopeFn<this>;
-        });
-        this.scope(scopeFns);
-        return this;
-    }
-
-    scope(scopeFn: ScopeFn<this>): this;
-    scope(scopeFns: Array<ScopeFn<this>>): this;
-    scope(scopeFn:  ScopeFn<this> | Array<ScopeFn<this>>): this {
-        const scopeFns = Array.isArray(scopeFn) ? scopeFn : [scopeFn];
-        scopeFns.forEach(scopeFn => {
-            scopeFn(this);
-        });
-        return this;
-    }
     /**
      * Sets entity's relation with which this query builder gonna work.
      */

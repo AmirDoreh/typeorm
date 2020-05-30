@@ -41,4 +41,11 @@ export class Post {
             return qb.andWhere('views >= :views', {views: views});
         }
     }
+
+    @Scope()
+    static idAtMost(id: number): (qb: SelectQueryBuilder<Post>) => SelectQueryBuilder<Post> {
+        return function(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
+            return qb.andWhere('id <= :id', {id: id});
+        }
+    }
 }

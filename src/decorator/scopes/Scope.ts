@@ -1,8 +1,6 @@
 import {getMetadataArgsStorage} from "../../";
 import {ScopeMetadataArgs} from "../../metadata-args/ScopeMetadataArgs";
 
-export type ScopeFn<QB> = (qb: QB) => QB;
-
 export function Scope(global: boolean = false): Function {
     return function (object: Object, propertyName: string) {
         getMetadataArgsStorage().scopes.push({
