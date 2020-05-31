@@ -68,7 +68,7 @@ const posts = await postRepository
 `.scope()` accepts one scope or an array of scopes. For example, `.scope([Post.isDraft, Post.popular])` is okay.
 
 
-See more examples [here](test/functional/scopes/scope-query-builder.ts)
+See more examples [here](../test/functional/scopes/scope-query-builder.ts)
 
 ## Usage in Active Record
 
@@ -79,4 +79,4 @@ const posts = await postRepository
         scope: Post.isDraft, // or [Post.isDraft]
     });
 ```
-See more examples [here](test/functional/scopes/scope-find.ts)
+See more examples [here](../test/functional/scopes/scope-find.ts)
