@@ -43,6 +43,7 @@ Then add `@Scope()` decorator to the function to indicate it as a scope function
 ### Unscoped
 ```typescript
 const posts = await postRepository
+    .createQueryBuilder("post")
     .unscoped()
     .getMany();
 ```
@@ -61,6 +62,7 @@ class Post extends BaseEntity {
 }
 
 const posts = await postRepository
+    .createQueryBuilder("post")
     .scope(Post.isDraft)
     .getMany();
 ```
@@ -76,7 +78,31 @@ See more examples [here](../test/functional/scopes/scope-query-builder.ts)
 const posts = await postRepository
     .find({
         unscoped: true,
-        scope: Post.isDraft, // or [Post.isDraft]
+        scope: Post.isDraft, // the same as -> scope: [Post.isDraft]
     });
 ```
 See more examples [here](../test/functional/scopes/scope-find.ts)
+
+## Pass args to scope functions
+
+```typescript
+class Post extends BaseEntity {
+    // ...
+    @Column()
+    views: number;
+
+    @Scope()
+    static hasViewsAtLeast(views: number): (qb: SelectQueryBuilder<Post>) => SelectQueryBuilder<Post> {
+        return function(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
+            return qb.andWhere('views >= :views', {views: views});
+        }
+    }
+}
+
+const posts = await postRepository
+    .createQueryBuilder("post")
+    .scope(Post.hasViewsAtLeast(200))
+    .scope(Post.isDraft)
+    .getMany();
+```
+The idea is using Higher-order functions.
