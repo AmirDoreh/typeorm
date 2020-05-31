@@ -10,7 +10,7 @@
   - Repository/Entity's `find`, `findOne`, `findByIds`, `count`, etc.
 - Not support in create, update and delete operations
 
-## Usage in SelectQueryBuilder:
+## Usage in SelectQueryBuilder
 
 ### Basic
 
@@ -36,9 +36,9 @@ const posts = await postRepository
     .getMany();
 // query: SELECT ... WHERE stage = ? -- PARAMETERS: ["public"]
 ```
-In the above example, we define a **static** function `isPublic`. It's passed one arguments `qb: SelectQueryBuilder<Entity>`. We can add as many operations as we want such as `andWhere`, `groupBy`, `limit` to the qb. Anything `SelectQueryBuilder` and `QueryBuilder` support will be okay. Finally, return qb itself.
+In the above example, we define a **static** function `isPublic`. It's passed one argument `qb: SelectQueryBuilder<Entity>`. We can add as many operations as we want such as `andWhere`, `groupBy`, `limit` to the qb. Anything `SelectQueryBuilder` and `QueryBuilder` support will be okay. Finally, return qb itself.
 
-Then add @Scope() decorator to the function to indicate it a scope function. @Scope(true) means it's a global scope that will be executed automatically in any select operation.
+Then add `@Scope()` decorator to the function to indicate it as a scope function. `@Scope(true)` means it's a global scope which will be executed automatically in any select operation.
 
 ### Unscoped
 ```typescript
@@ -64,13 +64,13 @@ const posts = await postRepository
     .scope(Post.isDraft)
     .getMany();
 ```
-`isDraft` is not a global scope, but we can add it to by calling `.scope(<Entity.MyScope>)`.  
+`isDraft` is not a global scope, but we can add it by calling `.scope(<Entity.MyScope>)`.  
 `.scope()` accepts one scope or an array of scopes. For example, `.scope([Post.isDraft, Post.popular])` is okay.
 
 
-See more examples [here](typeorm/blob/master/test/functional/scopes/scope-query-builder.ts)
+See more examples [here](../../typeorm/blob/master/test/functional/scopes/scope-query-builder.ts)
 
-## Usage in Active Record:
+## Usage in Active Record
 
 ```typescript
 const posts = await postRepository
@@ -79,4 +79,4 @@ const posts = await postRepository
         scope: Post.isDraft, // or [Post.isDraft]
     });
 ```
-See more examples [here](typeorm/blob/master/test/functional/scopes/scope-find.ts)
+See more examples [here](/typeorm/blob/master/test/functional/scopes/scope-find.ts)
