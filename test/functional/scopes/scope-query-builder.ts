@@ -105,7 +105,7 @@ describe.only("scopes > query builder", () => {
         expect(draftAndView200Posts.length).equal(1);
         draftAndView200Posts[0].title.should.equal('post #2');
 
-        const draftAndView200PostsAgain = await connection
+        const draftAndView200Posts2 = await connection
             .getRepository(Post)
             .createQueryBuilder("post")
             .unscoped()
@@ -113,8 +113,19 @@ describe.only("scopes > query builder", () => {
             .scope(Post.isDraft)
             .getMany();
 
-        expect(draftAndView200PostsAgain.length).equal(1);
-        draftAndView200PostsAgain[0].title.should.equal('post #2');
+        expect(draftAndView200Posts2.length).equal(1);
+        draftAndView200Posts2[0].title.should.equal('post #2');
+
+
+        const draftAndView200Posts3 = await connection
+            .getRepository(Post)
+            .createQueryBuilder("post")
+            .unscoped()
+            .scope(Post.draftAndView200)
+            .getMany();
+
+        expect(draftAndView200Posts3.length).equal(1);
+        draftAndView200Posts3[0].title.should.equal('post #2');
     })));
 
 });

@@ -3,10 +3,11 @@ import {PrimaryGeneratedColumn} from "../../../../src/decorator/columns/PrimaryG
 import {Column} from "../../../../src/decorator/columns/Column";
 import {Scope} from "../../../../src/decorator/scopes/Scope";
 import {SelectQueryBuilder} from "../../../../src/query-builder/SelectQueryBuilder";
+import {BaseEntity} from "../../../../src/repository/BaseEntity";
 
 
 @Entity()
-export class Post {
+export class Post extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -20,6 +21,13 @@ export class Post {
     @Column()
     views: number;
 
+    @Scope()
+    static idAtMost(id: number): (qb: SelectQueryBuilder<Post>) => SelectQueryBuilder<Post> {
+        return function(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
+            return qb.andWhere('id <= :id', {id: id});
+        }
+    }
+
     @Scope(true)
     static isPublic(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
         return qb.andWhere('stage = :stage', {stage: 'public'});
@@ -32,7 +40,7 @@ export class Post {
 
     @Scope(true)
     static hasViewsAtLeast100(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
-        return qb.andWhere('views >= :views', {views: 100});
+        return Post.hasViewsAtLeast(100)(qb);
     }
 
     @Scope()
@@ -43,9 +51,7 @@ export class Post {
     }
 
     @Scope()
-    static idAtMost(id: number): (qb: SelectQueryBuilder<Post>) => SelectQueryBuilder<Post> {
-        return function(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
-            return qb.andWhere('id <= :id', {id: id});
-        }
+    static draftAndView200(qb: SelectQueryBuilder<Post>): SelectQueryBuilder<Post> {
+        return [Post.isDraft, Post.hasViewsAtLeast(200)].reduce((q, s) => s(q), qb);
     }
 }
